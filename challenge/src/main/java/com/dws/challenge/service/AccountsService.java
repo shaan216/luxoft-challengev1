@@ -48,13 +48,22 @@ public class AccountsService {
 
 	/**
 	 * 
-	 * This method is responsible to transfer the funds from source to destination account 
-	 * in a thread safe manner. 
-	 * In real time scenario this method should be under Transactional 
-	 * boundaries to ensure data consistency with proper Transactional Propagation and Isolation level
+	 * This method is responsible to transfer the funds from source to destination
+	 * account in a thread safe manner. In real time scenario this method should be
+	 * under Transactional boundaries to ensure data consistency with proper
+	 * Transactional Propagation and Isolation level
 	 * 
 	 */
 	public ResponseEntity<Object> fundTransfer(String fromAccount, String toAccount, BigDecimal amount) {
+		
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				
+			}
+		}).start();
 
 		validateAccount(fromAccount, toAccount);
 		validateTransferAmount(amount);
@@ -63,15 +72,16 @@ public class AccountsService {
 		Account destinationAccount = accountsRepository.getAccount(toAccount);
 		if (sourceAccount != null && destinationAccount != null) {
 			if (sourceAccount.getAccountId() != destinationAccount.getAccountId()) {
-				if (sourceAccount.getBalance().doubleValue() >= amount.doubleValue()) {
-					
-					synchronized (this) {
+				synchronized (this) {
+					if (sourceAccount.getBalance().doubleValue() >= amount.doubleValue()) {
 
-						transferFunds(sourceAccount, destinationAccount, amount);
+							transferFunds(sourceAccount, destinationAccount, amount);
+							
+					} else {
+						throw new InsufficientFundsException(INSUFFICIENT_BAL);
 					}
-				} else {
-					throw new InsufficientFundsException(INSUFFICIENT_BAL);
 				}
+
 			} else {
 				throw new InvalidAccountException(SAME_WITHDRAW_DEPOSIT_ACC);
 			}

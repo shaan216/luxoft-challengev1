@@ -56,15 +56,6 @@ public class AccountsService {
 	 */
 	public ResponseEntity<Object> fundTransfer(String fromAccount, String toAccount, BigDecimal amount) {
 		
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				
-			}
-		}).start();
-
 		validateAccount(fromAccount, toAccount);
 		validateTransferAmount(amount);
 
